@@ -1,0 +1,29 @@
+# Terraform directories
+.terraform/
+**/.terraform/
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Terraform variable files (often contain secrets)
+*.tfvars
+*.tfvars.json
+
+# Terraform CLI configuration
+.terraformrc
+terraform.rc
+
+# Local credentials and secrets
+*.pem
+*.key
+*.p12
+*.cer
+.env
+.env.*
+*.env
+credentials
+*.credentials
+.aws/
