@@ -89,10 +89,7 @@ Each branch represents a complete milestone in the infrastructure.
 
 > **Current Branch:** `networking`
 
-*(Architecture image will be added here.)*
-
-```md
-![Architecture](images/networking-architecture.png)
+![Networking Architecture](images/networking-architecture.png)
 ```
 
 ---
