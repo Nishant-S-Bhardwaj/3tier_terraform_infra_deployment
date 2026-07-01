@@ -31,3 +31,14 @@ variable "az_2" {
   description = "Secondary Availability Zone"
   type        = string
 }
+variable "ami_id" {
+  type = string
+}
+
+variable "key_name" {
+  type = string
+}
+
+variable "instance_type" {
+  default = "t2.micro"
+}
