@@ -6,11 +6,11 @@ resource "aws_lb_target_group" "external_frontend_tg" {
   vpc_id      = var.vpc_id
 
   health_check {
-    protocol           = "HTTP"
-    path               = "/"
-    matcher            = "200-399"
-    interval           = 30
-    timeout            = 5
+    protocol            = "HTTP"
+    path                = "/"
+    matcher             = "200-399"
+    interval            = 30
+    timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }

@@ -42,3 +42,21 @@ variable "key_name" {
 variable "instance_type" {
   default = "t2.micro"
 }
+
+variable "alarm_email" {
+  description = "Email address for ASG CloudWatch/SNS notifications"
+  type        = string
+  default     = "alerts@example.com"
+}
+
+variable "scale_up_cpu_threshold" {
+  description = "CPU threshold to trigger frontend/backend scale-up alarms"
+  type        = number
+  default     = 70
+}
+
+variable "scale_down_cpu_threshold" {
+  description = "CPU threshold to trigger frontend/backend scale-down alarms"
+  type        = number
+  default     = 30
+}

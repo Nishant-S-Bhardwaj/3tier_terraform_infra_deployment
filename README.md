@@ -1,5 +1,7 @@
 # 🚀 AWS 3-Tier Infrastructure Deployment using Terraform
 
+This repository now includes autoscaling policies, CloudWatch alarms, SNS notifications, remote state storage using S3 and DynamoDB, and root outputs for key infrastructure values.
+
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-623CE4?style=for-the-badge&logo=terraform)
 ![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=for-the-badge&logo=amazonaws)
 ![Status](https://img.shields.io/badge/Status-Networking_Completed-success?style=for-the-badge)
@@ -182,6 +184,17 @@ Internet
 
 # ⚙ Terraform Workflow
 
+## Remote Backend
+
+The configuration uses an S3 backend plus DynamoDB state locking. Create the S3 bucket and DynamoDB table before the first run:
+
+```bash
+aws s3api create-bucket --bucket terraform-state-3tier-dev --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
+aws dynamodb create-table --table-name terraform-state-locks --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --billing-mode PAY_PER_REQUEST --region ap-south-1
+```
+
+## Deployment Steps
+
 ```bash
 terraform init
 
@@ -197,6 +210,15 @@ terraform destroy -var-file="dev.tfvars"
 ```
 
 ---
+
+# 🧩 Implemented Features
+
+- Auto Scaling Groups for frontend and backend tiers
+- Simple scaling policies for scale-in and scale-out actions
+- CloudWatch CPU alarms for both tiers
+- SNS topic and email subscription for notifications
+- Remote state backend backed by S3 and DynamoDB
+- Outputs for the frontend ALB DNS name and zone ID
 
 # 📚 Key Concepts Learned
 
