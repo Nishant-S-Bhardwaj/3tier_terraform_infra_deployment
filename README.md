@@ -1,256 +1,207 @@
-# 🚀 AWS 3-Tier Infrastructure Deployment using Terraform
+# 🚀 AWS 3-Tier Infrastructure with Terraform
 
-This repository now includes autoscaling policies, CloudWatch alarms, SNS notifications, remote state storage using S3 and DynamoDB, and root outputs for key infrastructure values.
+This repository contains a Terraform-based AWS reference architecture for deploying a web application stack with networking, security, compute, load balancing, autoscaling, and observability in place.
 
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-623CE4?style=for-the-badge&logo=terraform)
 ![AWS](https://img.shields.io/badge/AWS-Cloud-FF9900?style=for-the-badge&logo=amazonaws)
-![Status](https://img.shields.io/badge/Status-Networking_Completed-success?style=for-the-badge)
-![Learning](https://img.shields.io/badge/Learning-In_Public-blue?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+![Learning](https://img.shields.io/badge/Learning-Terraform%2FAWS-blue?style=for-the-badge)
 
 ---
 
-# 📖 About This Project
+## 📖 Overview
 
-This repository documents my journey of building a **production-inspired AWS 3-Tier Infrastructure** completely from scratch using **Terraform**.
+This project is designed to help readers understand how to provision a production-inspired AWS environment using Terraform modules. The current implementation focuses on the core layers required to run a web application securely and reliably:
 
-Instead of pushing the final code all at once, every major infrastructure layer is developed on a dedicated Git branch, allowing anyone to follow the project step-by-step just like a real-world infrastructure development lifecycle.
+- VPC and subnet design across multiple Availability Zones
+- Public and private networking
+- Security groups for ingress and egress control
+- Application Load Balancers for frontend and backend traffic
+- EC2 launch templates and Auto Scaling Groups
+- CloudWatch alarms and SNS notifications for scaling and alerting
 
-The goal is not just to build infrastructure—but to understand **why** each AWS service exists, **how** they communicate, and **how** production-grade cloud infrastructure is designed.
-
----
-
-# 🎯 Learning Ladder
-
-```
-🏁 Start
-
-│
-
-├── ✅ Branch 1 : Networking
-│       ├── VPC
-│       ├── Public & Private Subnets
-│       ├── Internet Gateway
-│       ├── Route Tables
-│       ├── NAT Gateway
-│       └── Multi-AZ Networking
-│
-
-├── ⏳ Branch 2 : Security
-│       ├── Security Groups
-│       ├── NACLs
-│       └── IAM Roles
-│
-
-├── ⏳ Branch 3 : Compute
-│       ├── EC2
-│       ├── Launch Templates
-│       └── Auto Scaling Groups
-│
-
-├── ⏳ Branch 4 : Load Balancing
-│       ├── Application Load Balancer
-│       ├── Target Groups
-│       └── Health Checks
-│
-
-├── ⏳ Branch 5 : Database
-│       ├── RDS
-│       ├── DB Subnet Groups
-│       └── Multi-AZ Database
-│
-
-├── ⏳ Branch 6 : Observability
-│       ├── CloudWatch
-│       ├── SNS
-│       ├── Alarms
-│       └── Monitoring
-│
-
-└── 🚀 Final Production Infrastructure
-```
+> The current codebase is a strong foundation for a web application stack. It does not yet provision a managed database layer such as RDS, though the network and security layout already supports that extension.
 
 ---
 
-# 🌿 Branch Strategy
-
-Each branch represents a complete milestone in the infrastructure.
-
-| Branch | Description | Status |
-|---------|-------------|--------|
-| `networking` | AWS Networking Foundation | ✅ Completed |
-| `security` | Security Groups & IAM | ✅ Completed |
-| `compute` | EC2 & Auto Scaling | ✅ Completed |
-| `load-balancer` | Application Load Balancer | ✅ Completed |
-| `database` | Amazon RDS | ✅ Completed |
-| `observability` | Monitoring & Alerts | ✅ Completed |
-| `main` | Fully integrated production architecture | ✅ Completed |
-
----
-
-# 🏗 Current Architecture
-
-> **Current Branch:** `networking`
+## 🏗 Architecture Snapshot
 
 ![Networking Architecture](images/networking-architecture.png)
-```
+
+The architecture creates a layered environment where:
+
+- Public resources are exposed through an external Application Load Balancer
+- Private application instances run behind internal routing and health checks
+- Traffic is segmented using security groups and subnet design
+- Autoscaling and monitoring help the stack respond to changing load
 
 ---
 
-# 📦 Networking Components
+## ✅ What This Repository Provisions
 
-### VPC
+### Networking
+- VPC with DNS support enabled
+- Public subnets in two Availability Zones
+- Private application subnets in two Availability Zones
+- Database subnets for future database use
+- Internet Gateway and NAT-related routing components
 
-| Resource | Configuration |
-|----------|---------------|
-| CIDR | `10.0.0.0/16` |
-| DNS Support | ✅ |
-| DNS Hostnames | ✅ |
+### Security
+- ALB security group allowing HTTP/HTTPS from the internet
+- Frontend security group allowing traffic only from the ALB
+- Backend security group allowing traffic only from frontend instances
+- Database security group for future backend-to-database access
 
-### Public Subnets
+### Compute
+- Launch templates for frontend and backend EC2 instances
+- Auto Scaling Groups with desired, minimum, and maximum capacities
+- Target group integration for health-based scaling
 
-| Name | CIDR | AZ |
-|------|------|----|
-| Public-1 | `10.0.1.0/24` | ap-south-1a |
-| Public-2 | `10.0.2.0/24` | ap-south-1b |
+### Load Balancing
+- Public Application Load Balancer for frontend access
+- Internal Application Load Balancer for backend traffic
+- Target groups and listeners configured for HTTP
 
-### Private Application Subnets
-
-| Name | CIDR | AZ |
-|------|------|----|
-| App-1 | `10.0.11.0/24` | ap-south-1a |
-| App-2 | `10.0.12.0/24` | ap-south-1b |
-
-### Private Database Subnets
-
-| Name | CIDR | AZ |
-|------|------|----|
-| DB-1 | `10.0.21.0/24` | ap-south-1a |
-| DB-2 | `10.0.22.0/24` | ap-south-1b |
-
----
-
-# 🌍 Network Traffic Flow
-
-## Public Traffic
-
-```
-Internet
-      │
-Internet Gateway
-      │
-Public Route Table
-      │
-Public Subnets
-```
-
-## Private Traffic
-
-```
-Private EC2
-      │
-Private Route Table
-      │
-NAT Gateway
-      │
-Internet Gateway
-      │
-Internet
-```
+### Observability
+- SNS topic for alerts
+- Email subscription support via the configured alarm email
+- CloudWatch alarms for CPU-based scale-up and scale-down actions
 
 ---
 
-# 📂 Repository Structure
+## 📁 Repository Structure
 
 ```text
 .
-├── modules
-│   └── vpc
-│       ├── main.tf
-│       ├── subnet.tf
-│       ├── internet_gateway.tf
-│       ├── nat_gateway.tf
-│       ├── route_tables.tf
-│       ├── variables.tf
-│       └── outputs.tf
-│
-├── provider.tf
-├── version.tf
-├── variables.tf
+├── backend.tf
 ├── dev.tfvars
-└── README.md
+├── dev.tfvars.example
+├── main.tf
+├── outputs.tf
+├── provider.tf
+├── variables.tf
+├── version.tf
+├── images/
+├── modules/
+│   ├── alb/
+│   ├── compute/
+│   ├── security/
+│   └── vpc/
+```
+
+### Module responsibilities
+- modules/vpc: VPC, subnets, gateways, and routing
+- modules/security: security groups for ALB, frontend, backend, and database layers
+- modules/compute: launch templates, IAM, ASGs, alarms, and scaling policies
+- modules/alb: load balancers, target groups, and listeners
+
+---
+
+## ⚙ Prerequisites
+
+Before deploying, make sure you have:
+
+- An AWS account
+- AWS CLI configured with valid credentials
+- Terraform installed locally
+- A valid AMI ID for your chosen region
+- An EC2 key pair name
+- An email address for SNS notifications
+
+---
+
+## 🔧 Configuration
+
+1. Copy the example variables file:
+
+```bash
+cp dev.tfvars.example dev.tfvars
+```
+
+2. Edit dev.tfvars with your own values such as:
+
+- aws_region
+- environment
+- project
+- vpc_cidr
+- az_1 / az_2
+- ami_id
+- key_name
+- alarm_email
+
+Example values are already provided in dev.tfvars.example.
+
+---
+
+## 🚀 Deployment Steps
+
+Run the following commands from the repository root:
+
+```bash
+terraform init
+terraform fmt
+terraform validate
+terraform plan -var-file="dev.tfvars"
+terraform apply -var-file="dev.tfvars"
+```
+
+To destroy the infrastructure:
+
+```bash
+terraform destroy -var-file="dev.tfvars"
 ```
 
 ---
 
-# ⚙ Terraform Workflow
+## 🗄 Remote State Backend
 
-## Remote Backend
+The current repository uses local state by default. The backend configuration is intentionally commented out in backend.tf.
 
-The configuration uses an S3 backend plus DynamoDB state locking. Create the S3 bucket and DynamoDB table before the first run:
+If you want to use S3 and DynamoDB for remote state, uncomment the backend block in backend.tf and ensure the following resources already exist:
 
 ```bash
 aws s3api create-bucket --bucket terraform-state-3tier-dev --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
 aws dynamodb create-table --table-name terraform-state-locks --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema AttributeName=LockID,KeyType=HASH --billing-mode PAY_PER_REQUEST --region ap-south-1
 ```
 
-## Deployment Steps
+---
+
+## 📤 Outputs
+
+The root module exposes useful outputs such as:
+
+- frontend_alb_dns_name
+- frontend_alb_zone_id
+
+These values can be viewed after deployment with:
 
 ```bash
-terraform init
-
-terraform fmt
-
-terraform validate
-
-terraform plan -var-file="dev.tfvars"
-
-terraform apply -var-file="dev.tfvars"
-
-terraform destroy -var-file="dev.tfvars"
+terraform output
 ```
 
 ---
 
-# 🧩 Implemented Features
+## 💡 Notes for Readers
 
-- Auto Scaling Groups for frontend and backend tiers
-- Simple scaling policies for scale-in and scale-out actions
-- CloudWatch CPU alarms for both tiers
-- SNS topic and email subscription for notifications
-- Remote state backend backed by S3 and DynamoDB
-- Outputs for the frontend ALB DNS name and zone ID
+This repository is a practical learning project for Terraform on AWS. It shows how to structure infrastructure into reusable modules and how to wire together common components such as:
 
-# 📚 Key Concepts Learned
+- Networking
+- Security boundaries
+- Load balancing
+- Auto scaling
+- Monitoring and alerting
 
-- Infrastructure as Code (IaC)
-- Terraform Modules
-- Variable Management
-- CIDR Planning
-- AWS VPC Design
-- Multi-AZ Networking
-- Public vs Private Networking
-- Internet Gateway
-- Route Tables
-- NAT Gateway
-- Route Table Associations
+If you want to extend this project further, the next natural additions would be:
+
+- RDS database layer
+- HTTPS/TLS termination
+- IAM least-privilege refinements
+- CI/CD deployment automation
 
 ---
 
-# 📌 What's Next?
+## 👨‍💻 Author
 
-The next milestone is the **Security Layer**, where I'll implement:
+Nishant Bhardwaj
 
-- Security Groups
-- IAM Roles
-- Least Privilege Access
-- Network Security Design
-
----
-
-# 👨‍💻 Author
-
-**Nishant Bhardwaj**
-
-Building production-inspired cloud infrastructure while documenting the learning journey.
-
-⭐ If you found this repository useful, consider giving it a star.
+Building practical, production-inspired cloud infrastructure with Terraform and AWS.
